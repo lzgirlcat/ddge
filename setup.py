@@ -8,7 +8,6 @@ def long_description():
         return fp.read()
 
 def parse_requirements_file(path):
-    print(os.getcwd())
     with open(path) as fp:
         dependencies = (d.strip() for d in fp.read().split("\n") if d.strip())
         return [d for d in dependencies if not d.startswith("#")]

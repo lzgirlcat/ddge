@@ -24,7 +24,6 @@ class Client:
     def otp(self, username: str | None = None) -> bool:
         """Will use `self.username` if `username` not given"""
         params = {"user": username or self.username}
-        print(params)
         req = self.session.get(f"{API_BASE}{OTP}", params=params, headers=self.headers)
         req.raise_for_status()
         return True
