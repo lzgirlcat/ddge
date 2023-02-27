@@ -15,7 +15,7 @@ def parse_requirements_file(path):
 
 setuptools.setup(
     name="ddge",
-    version='0.2.137',
+    version='0.2.137.a',
     description="DuckDuckGo Email Protection CLI",
     long_description=long_description(),
     long_description_content_type="text/markdown",
