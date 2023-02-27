@@ -25,7 +25,7 @@ actions:
     remove              Delete the alias from the local storage.
 ```
 
-so after logging in you can just do ddge to generate a new alias.
+so after logging in you can just run the program to generate a new alias.
 ```
 $ ddge
 r5kog234s@duck.com
