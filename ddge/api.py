@@ -7,8 +7,9 @@ LOGIN = "/auth/login" #?otp=abc&user=user ; POST ; returns {"status": "authentic
 DASHBOARD = "/email/dashboard" # GET ; returns {"invites":[],"stats":{"addresses_generated":12},"user":{"access_token":"[...]","cohort":"[..]","email":"real_email","username":"user"}}
 GEN_EMAIL = "/email/addresses" # POST ; returns {"address":"1234abcd"}
 
+
 class Client:
-    def __init__(self, username: str, token: str | None = None, 
+    def __init__(self, username: str, token: str | None = None,
                  access_token: str | None = None)  ->  None:
         self.username = username
         self.token = token
@@ -18,16 +19,16 @@ class Client:
         self.logged_in = all((token, access_token))
         self.session = session()
         self.headers = {"Origin": "https://duckduckgo.com",
-                        "Referer": "https://duckduckgo.com",	
+                        "Referer": "https://duckduckgo.com",
                         "User-Agent": USER_AGENT}
-    
+
     def otp(self, username: str | None = None) -> bool:
         """Will use `self.username` if `username` not given"""
         params = {"user": username or self.username}
         req = self.session.get(f"{API_BASE}{OTP}", params=params, headers=self.headers)
         req.raise_for_status()
         return True
-    
+
     def login(self, otp: str, username: str | None = None) -> dict:
         """Will use `self.username` if `username` not given
         otp can be either the phrase or url

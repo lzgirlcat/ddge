@@ -3,12 +3,13 @@ from sys import platform
 from json import dump, load
 from os import makedirs, path
 
-DATA = {
+DEFAULT_DATA = {
     "token": None,
     "access_token": None,
     "username": None,
     "aliases": []
 }
+
 
 def get_adequate_config_path():
     if platform == 'darwin':
@@ -20,7 +21,9 @@ def get_adequate_config_path():
     else:
         return "~/.config/ddge.json"
 
+
 DEFAULT_CONFIG_PATH = get_adequate_config_path()
+
 
 class Storage:
     def __init__(self, file_path: str = DEFAULT_CONFIG_PATH) -> None:
@@ -30,9 +33,9 @@ class Storage:
             with open(self.file_path, 'r') as f:
                 self.data = load(f)
         else:
-            self.data = {**DATA}
+            self.data = {**DEFAULT_DATA}
             self.save()
-    
+
     def save(self):
         dir = path.dirname(self.file_path)
         if dir:
@@ -42,39 +45,39 @@ class Storage:
             dump(self.data, f)
 
     @property
-    def username(self):
+    def username(self) -> str:
         return self.data['username']
 
     @property
-    def aliases(self):
+    def aliases(self) -> list[dict]:
         return self.data['aliases']
 
     @property
-    def token(self):
+    def token(self) -> str:
         return self.data['token']
 
     @property
-    def access_token(self):
+    def access_token(self) -> str:
         return self.data['access_token']
 
-    def remove_alias(self, key_like):
+    def remove_alias(self, key_like: str):
         """`key_like` accepts the index, full alias and alias username(the part before @)"""
         ret = None
         for index, alias in enumerate(self.aliases):
-            if str(index) == key_like:
+            if key_like == str(index):
                 ret = self.data['aliases'].pop(index)
                 break
-            elif alias['address'] == key_like:
+            elif key_like == alias['address']:
                 ret = self.data['aliases'].pop(index)
                 break
-            elif alias['address'] == key_like.split("@")[0]:
+            elif key_like.split("@")[0] == alias['address']:
                 ret = self.data['aliases'].pop(index)
                 break
         if ret:
             self.save()
             return ret
         raise KeyError(f"Didn't find any aliases matching '{key_like}'")
-    
+
     def add_alias(self, address):
         alias = {
             "address": address,
@@ -89,4 +92,3 @@ class Storage:
         self.data['access_token'] = access_token
         self.data['username'] = username
         self.save()
-        
