@@ -56,7 +56,7 @@ class Client:
         self.token = token
         res = self.dashboard()
         self.access_token = res['user']['access_token']
-        self.real_email = res['user']['eamil']
+        self.real_email = res['user']['email']
         self.generated_addresses = res['stats']['addresses_generated']
         self.logged_in = True
         return True
