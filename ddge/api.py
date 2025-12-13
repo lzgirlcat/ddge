@@ -2,25 +2,28 @@ from requests import session
 
 USER_AGENT = "Mozilla/5.0 (X11; Linux x86_64; rv:109.0) Gecko/20100101 Firefox/110.0"
 API_BASE = "https://quack.duckduckgo.com/api"
-OTP = "/auth/loginlink" #?user=user ; GET ; always returns {}
-LOGIN = "/auth/login" #?otp=abc&user=user ; POST ; returns {"status": "authenticated", "token": "[...]", "user": "user"}
-DASHBOARD = "/email/dashboard" # GET ; returns {"invites":[],"stats":{"addresses_generated":12},"user":{"access_token":"[...]","cohort":"[..]","email":"real_email","username":"user"}}
-GEN_EMAIL = "/email/addresses" # POST ; returns {"address":"1234abcd"}
+OTP = "/auth/loginlink"  # ?user=user ; GET ; always returns {}
+LOGIN = "/auth/login"  # ?otp=abc&user=user ; POST ; returns {"status": "authenticated", "token": "[...]", "user": "user"}
+DASHBOARD = "/email/dashboard"  # GET ; returns {"invites":[],"stats":{"addresses_generated":12},"user":{"access_token":"[...]","cohort":"[..]","email":"real_email","username":"user"}}
+GEN_EMAIL = "/email/addresses"  # POST ; returns {"address":"1234abcd"}
 
 
 class Client:
-    def __init__(self, username: str, token: str | None = None,
-                 access_token: str | None = None)  ->  None:
+    def __init__(
+        self, username: str, token: str | None = None, access_token: str | None = None
+    ) -> None:
         self.username = username
         self.token = token
         self.access_token = access_token
-        self.generated_addresses: int | None = None # will be None if not logged in
-        self.real_email: str | None = None # will be None if not logged in
+        self.generated_addresses: int | None = None  # will be None if not logged in
+        self.real_email: str | None = None  # will be None if not logged in
         self.logged_in = all((token, access_token))
         self.session = session()
-        self.headers = {"Origin": "https://duckduckgo.com",
-                        "Referer": "https://duckduckgo.com",
-                        "User-Agent": USER_AGENT}
+        self.headers = {
+            "Origin": "https://duckduckgo.com",
+            "Referer": "https://duckduckgo.com",
+            "User-Agent": USER_AGENT,
+        }
 
     def otp(self, username: str | None = None) -> bool:
         """Will use `self.username` if `username` not given"""
@@ -34,14 +37,16 @@ class Client:
         otp can be either the phrase or url
         returns {"status": "authenticated", "token": "[...]", "user": "user"}"""
         if "https://" in otp:
-            otp = otp.split('otp=')[-1].split('&')[0]
+            otp = otp.split("otp=")[-1].split("&")[0]
         else:
-            otp = otp.replace(' ', '-')
+            otp = otp.replace(" ", "-")
         params = {"user": username or self.username, "otp": otp}
-        req = self.session.get(f"{API_BASE}{LOGIN}", params=params, headers=self.headers)
+        req = self.session.get(
+            f"{API_BASE}{LOGIN}", params=params, headers=self.headers
+        )
         req.raise_for_status()
         d = req.json()
-        return d['token']
+        return d["token"]
 
     def dashboard(self) -> dict:
         """returns `{"invites":[],"stats":{"addresses_generated":12},"user":{"access_token":"[...]","cohort":"[..]","email":"real_email","username":"user"}}`"""
@@ -66,4 +71,4 @@ class Client:
         req = self.session.post(f"{API_BASE}{GEN_EMAIL}", headers=headers)
         req.raise_for_status()
         d = req.json()
-        return d['address']
+        return d["address"]
