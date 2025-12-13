@@ -67,6 +67,11 @@ class CLI:
         table.title = "Removed alias"
         self.console.print(table)
 
+    def get_email(self, key_like: str, recipient_email: str):
+        alias = key_like if "@" in key_like else self.storage.alias_getter(key_like)[1]["address"] + "@duck.com"
+        s = recipient_email.replace("@", "_at_") + "_" + alias
+        self.console.print(s)
+
     def logout(self):
         self.storage.data = {**DEFAULT_DATA}
         self.storage.save()
@@ -126,6 +131,17 @@ def main():
         "key_like", help="index, full alias or alias username(the part before @)"
     )
     remove.set_defaults(func=cli.remove_alias, pass_=["key_like"])
+
+    get_email = subparsers.add_parser(
+        "get_email", help="Format the recipient address in a way that lets you send the email through duck.com"
+    )
+    get_email.add_argument(
+        "key_like", help="index, full alias or alias username(the part before @)"
+    )
+    get_email.add_argument(
+        "recipient_email"
+    )
+    get_email.set_defaults(func=cli.get_email, pass_=["key_like", "recipient_email"])
 
     args = parser.parse_args()
 

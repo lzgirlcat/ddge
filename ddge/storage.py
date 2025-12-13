@@ -12,7 +12,7 @@ def get_adequate_config_path():
         return "~/Library/Preferences/ddge/data.json"
     elif "win" in platform:
         # same with this
-        return "%USERPROFILE%\AppData\Local\ddge\data.json"
+        return "%USERPROFILE%\\AppData\\Local\\ddge\\data.json"
     else:
         return "~/.config/ddge.json"
 
@@ -55,20 +55,22 @@ class Storage:
     def access_token(self) -> str:
         return self.data["access_token"]
 
-    def remove_alias(self, key_like: str):
-        """`key_like` accepts the index, full alias and alias username(the part before @)"""
-        ret = None
+    def alias_getter(self, key_like: str):
         for index, alias in enumerate(self.aliases):
             if key_like == str(index):
-                ret = self.data["aliases"].pop(index)
-                break
+                return index, alias
             elif key_like == alias["address"]:
-                ret = self.data["aliases"].pop(index)
-                break
+                return index, alias
             elif key_like.split("@")[0] == alias["address"]:
-                ret = self.data["aliases"].pop(index)
-                break
-        if ret:
+                return index, alias
+        return None, None
+
+    def remove_alias(self, key_like: str):
+        """`key_like` accepts the index, full alias and alias username(the part before @)"""
+        index, ret = self.alias_getter(key_like)
+
+        if index is not None:
+            self.data["aliases"].pop(index)
             self.save()
             return ret
         raise KeyError(f"Didn't find any aliases matching '{key_like}'")
